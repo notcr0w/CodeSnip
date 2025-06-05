@@ -421,18 +421,22 @@ void rename(std::string& old_template_name, std::string& new_template_name, std:
 }
 
 int main(int argc, char* argv[]) {
+    // Check if at least one argument (the command) is provided
     if (argc == 1) {
-        return 1;
+        return 1; // Exit early if no command is given
     }
 
     std::string command(argv[1]);
 
+    // Handle 'insert' command
     if (command == "insert") {
         if (argc < 6) {
+            // Print usage instructions if arguments are missing
             std::cerr << "Usage: " << argv[0] << " insert <template_name> <target_file> <line_number> <snippet_file>" << std::endl;
             return 1;
         }
 
+        // Parse arguments
         std::string snippet_file = argv[5];
         std::string target_file = argv[3];
         std::string template_name = argv[2];
@@ -440,13 +444,15 @@ int main(int argc, char* argv[]) {
 
         insert(snippet_file, target_file, template_name, line_number);
     }
-    
+
+    // Handle 'extract' command
     else if (command == "extract") {
-        if (argc < 6) {
+        if (argc < 7) {
             std::cerr << "Usage: " << argv[0] << " extract <source_file> <start_line> <end_line> <new_template_name> <snippet_file>" << std::endl;
             return 1;
         }
 
+        // Parse and validate line numbers
         std::string source_file = argv[2];
         if (source_file.empty()) {
             std::cerr << "Source file cannot be empty." << std::endl;
@@ -471,6 +477,7 @@ int main(int argc, char* argv[]) {
         extract(source_file, start_line, end_line, new_template_name, snippet_file);
     }
 
+    // Handle 'list' command
     else if (command == "list") {
         if (argc < 3) {
             std::cerr << "Usage: " << argv[0] << " list <snippet_file>" << std::endl;
@@ -481,6 +488,7 @@ int main(int argc, char* argv[]) {
         list_templates(snippet_file);
     }
 
+    // Handle 'show' command
     else if (command == "show") {
         if (argc < 4) {
             std::cerr << "Usage: " << argv[0] << " show <template_name> <snippet_file>" << std::endl;
@@ -492,6 +500,7 @@ int main(int argc, char* argv[]) {
         show(template_name, snippet_file);
     }
 
+    // Handle 'delete' command
     else if (command == "delete") {
         if (argc < 4) {
             std::cerr << "Usage: " << argv[0] << " delete <template_name> <snippet_file>" << std::endl;
@@ -503,6 +512,7 @@ int main(int argc, char* argv[]) {
         delete_template(template_name, snippet_file);
     }
 
+    // Handle 'rename' command
     else if (command == "rename") {
         if (argc < 5) {
             std::cerr << "Usage: " << argv[0] << " rename <old_template_name> <new_template_name> <snippet_file>" << std::endl;
@@ -514,12 +524,12 @@ int main(int argc, char* argv[]) {
         std::string snippet_file = argv[4];
         rename(old_template_name, new_template_name, snippet_file);
     }
-    
+
+    // Unknown command handler
     else {
         std::cerr << "Unknown command: " << command << std::endl;
         return 1;
     }
 
-
-    return 0;
+    return 0; // Program executed successfully
 }
