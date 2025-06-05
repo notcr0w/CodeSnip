@@ -103,39 +103,9 @@ std::string& template_name, int line_number) {
     target_output.close();
 }
 
-void extract(std::string& snippet_file, std::string& target_file,
-std::string& template_name, int line_number) {
-    std::ifstream target_input(target_file);
-    if (!target_input.is_open()) {
-        std::cerr << "Error opening target file: " << target_file << std::endl;
-        return;
-    }
-
-    std::vector<std::string> target_lines;
-    std::string line;
-
-    while (std::getline(target_input, line)) {
-        target_lines.push_back(line);
-    }
-
-    target_input.close();
-
-    if (line_number < 1 || line_number > (int)target_lines.size()) {
-        std::cerr << "Line number out of range." << std::endl;
-        return;
-    }
-
-    std::ofstream snippet_output(snippet_file, std::ios_base::app);
-    if (!snippet_output.is_open()) {
-        std::cerr << "Error writing to snippet file: " << snippet_file << std::endl;
-        return;
-    }
-
-    snippet_output << "#-- name: " << template_name << '\n';
-    snippet_output << target_lines[line_number - 1] << '\n';
-    snippet_output << "#-- end\n";
-
-    snippet_output.close();
+void extract(std::string& source_file, int start_line,
+int end_line, std::string& new_template_name, std::string& snippet_file) {
+    
 }
 
 int main(int argc, char* argv[]) {
@@ -161,16 +131,32 @@ int main(int argc, char* argv[]) {
     
     else if (command == "extract") {
         if (argc < 6) {
-            std::cerr << "Usage: " << argv[0] << " extract <template_name> <target_file> <line_number> <snippet_file>" << std::endl;
+            std::cerr << "Usage: " << argv[0] << " extract <source_file> <start_line> <end_line> <new_template_name> <snippet_file>" << std::endl;
             return 1;
         }
 
-        std::string snippet_file = argv[5];
-        std::string target_file = argv[3];
-        std::string template_name = argv[2];
-        int line_number = std::stoi(argv[4]);
+        std::string source_file = argv[2];
+        if (source_file.empty()) {
+            std::cerr << "Source file cannot be empty." << std::endl;
+            return 1;
+        }
 
-        extract(snippet_file, target_file, template_name, line_number);
+        int start_line = std::stoi(argv[3]);
+        int end_line = std::stoi(argv[4]);
+        if (start_line < 1 || end_line < start_line || start_line > end_line) {
+            std::cerr << "Invalid line range." << std::endl;
+            return 1;
+        }
+
+        std::string new_template_name = argv[5];
+        if (new_template_name.empty()) {
+            std::cerr << "New template name cannot be empty." << std::endl;
+            return 1;
+        }
+
+        std::string snippet_file = argv[6];
+
+        extract(source_file, start_line, end_line, new_template_name, snippet_file);
     }
     
     else {
