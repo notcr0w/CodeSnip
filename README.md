@@ -39,6 +39,8 @@ private:
 
 ---
 
+## Command Usage
+
 # Insert a snippet into a file at a given line
 codesnip insert --name <template_name> --into <target_file> --at <line_number> --file <snippet_file>
 
