@@ -235,7 +235,17 @@ int end_line, std::string& new_template_name, std::string& snippet_file) {
               << "' in snippet file " << snippet_file << "." << std::endl;
 }
 
-void list_templates(std::string& snippet_file) {
+/**
+ * @brief Lists all template names stored in the given snippet file.
+ *
+ * Searches for lines starting with "#-- name: " and prints the name of each template.
+ * If no templates are found, prints a message indicating so.
+ *
+ * @param snippet_file Path to the snippet file to read from.
+ */
+
+ void list_templates(std::string& snippet_file) {
+    // Open the snippet file for reading
     std::ifstream snippet_input(snippet_file);
     if (!snippet_input.is_open()) {
         std::cerr << "Error opening snippet file: " << snippet_file << std::endl;
@@ -245,18 +255,22 @@ void list_templates(std::string& snippet_file) {
     std::string line;
     bool found = false;
 
-    // Read the snippet file and print all template names
+    // Read the file line by line
     while (std::getline(snippet_input, line)) {
+        // Look for lines that define a template name
         if (line.find("#-- name: ") == 0) {
             found = true;
-            std::cout << line.substr(10) << std::endl; // Print the template name
+            // Print just the template name (omit the "#-- name: " prefix)
+            std::cout << line.substr(10) << std::endl;
         }
     }
 
+    // If no template markers were found, print a message
     if (!found) {
         std::cout << "No templates found in " << snippet_file << "." << std::endl;
     }
 
+    // Close the file
     snippet_input.close();
 }
 
