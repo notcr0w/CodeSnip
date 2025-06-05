@@ -43,36 +43,36 @@ private:
 
 Insert a snippet into a file at a given line
 ```
-codesnip insert <template_name> <target_file> <line_number> <snippet_file>
+./codesnip.exe insert <template_name> <target_file> <line_number> <snippet_file>
 ```
 
 Extract lines from a file and save as a new snippet
 ```
-codesnip extract <source_file> <start_line> <end_line> <new_template_name> <snippet_file>
+./codesnip.exe extract <source_file> <start_line> <end_line> <new_template_name> <snippet_file>
 ```
 
 List all available templates in a snippet file
 ```
-codesnip list <snippet_file>
+./codesnip.exe list <snippet_file>
 ```
 
 View the contents of a specific template
 ```
-codesnip show <template_name> <snippet_file>
+./codesnip.exe show <template_name> <snippet_file>
 ```
 
 Delete a template by name
 ```
-codesnip delete <template_name> <snippet_file>
+./codesnip.exe delete <template_name> <snippet_file>
 ```
 
 Rename a template
 ```
-codesnip rename <old_name> <new_name> <snippet_file>
+./codesnip.exe rename <old_name> <new_name> <snippet_file>
 ```
 
 (Optional) Preview snippet insertion without modifying anything
 ```
-codesnip insert <template_name> <target_file> <line_number> <snippet_file> --dry-run
+./codesnip.exe insert <template_name> <target_file> <line_number> <snippet_file> --dry-run
 ```
 
