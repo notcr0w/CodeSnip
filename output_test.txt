@@ -1,124 +1,70 @@
+void extract(std::string& source_file, int start_line,
+int end_line, std::string& new_template_name, std::string& snippet_file) {
+    int line_number = 0;
 
-void insert(std::string &snippet_file, std::string& target_file,
-std::string &template_name, int line_number) {
+    // Opening and validating the source file for reading
+    std::ifstream source_input(source_file);
+    if (!source_input.is_open()) {
+        std::cerr << "Error opening source file: " << source_file << std::endl;
+        return;
+    }
+
+    std::vector<std::string> extracted_lines;
+    std::string line;
+
+    // Adding header line
+    extracted_lines.push_back("#-- name: " + new_template_name);
+
+    // Adding lines within the specified range
+    while (std::getline(source_input, line)) {
+        line_number++;
+        if (line_number >= start_line && line_number <= end_line) {
+            extracted_lines.push_back(line);
+        }
+    }
+
+    // Add the end line to the extracted lines
+    extracted_lines.push_back("#-- end");
+
+    // Check if any lines were extracted
+    if (extracted_lines.size() == 2) { // Only the header and end lines
+        std::cerr << "No lines extracted from " << source_file
+                  << " for the specified range." << std::endl;
+        source_input.close();
+        return;
+    }
+
+    // If the number of extracted lines does not match the expected range, report an error
+    if ((int)extracted_lines.size() != (end_line - start_line + 3)) { // +3 for header and end lines
+        std::cerr << "Extracted lines do not match the specified range." << std::endl;
+        return;
+    }
+
+    source_input.close();
+
+    line_number = 0;
     std::ifstream snippet_input(snippet_file);
     if (!snippet_input.is_open()) {
         std::cerr << "Error opening snippet file: " << snippet_file << std::endl;
         return;
     }
-
-    std::vector<std::string> lines;
-    std::string line;
-    bool found = false;
-
+    
+    // Check if the template already exists in the snippet file
     while (std::getline(snippet_input, line)) {
-        if (line == "#-- name: " + template_name) {
-            found = true;
-            continue;
-        }
-
-        if (found) {
-            if (line == "#-- end") {
-                break;
-            }
-            lines.push_back(line);
+        line_number++;
+        if (line == "#-- name: " + new_template_name) {
+            std::cerr << "Template '" << new_template_name << "' already exists in snippet file." << std::endl;
+            snippet_input.close();
+            return;
         }
     }
 
     snippet_input.close();
 
-    if (!found) {
-        std::cerr << "Template '" << template_name << "' not found in snippet file." << std::endl;
-        return;
-    }
+    file_overwrite(snippet_file, extracted_lines, line_number + 2); // +2 to account for the header and end lines
 
-    if (lines.empty()) {
-        std::cerr << "No lines found for template '" << template_name << "'." << std::endl;
-        return;
-    }
-
-    std::fstream target_file_stream(target_file, std::ios::in | std::ios::out);
-    if (!target_file_stream.is_open()) {
-        std::cerr << "Error opening target file: " << target_file << std::endl;
-        return;
-    }
-
-    int current_line = 0;
-
-    while (current_line < line_number && std::getline(target_file_stream, line)) {
-        current_line++;
-        if (current_line == line_number) {
-            for (unsigned int i = 0; i < lines.size(); ++i) {
-                target_file_stream << lines[i] << std::endl;
-            }
-        }
-    }
-
-    if (current_line < line_number) {
-        std::cerr << "Line number " << line_number << " exceeds the number of lines in the target file." << std::endl;
-    }
-    target_file_stream.close();
-    
-    std::cout << "Inserted template '" << template_name << "' into " << target_file << " at line " << line_number << "." << std::endl;
-}
-std::string &template_name, int line_number) {
-    std::ifstream snippet_input(snippet_file);
-    if (!snippet_input.is_open()) {
-        std::cerr << "Error opening snippet file: " << snippet_file << std::endl;
-        return;
-    }
-
-    std::vector<std::string> lines;
-    std::string line;
-    bool found = false;
-
-    while (std::getline(snippet_input, line)) {
-        if (line == "#-- name: " + template_name) {
-            found = true;
-            continue;
-        }
-
-        if (found) {
-            if (line == "#-- end") {
-                break;
-            }
-            lines.push_back(line);
-        }
-    }
-
-    snippet_input.close();
-
-    if (!found) {
-        std::cerr << "Template '" << template_name << "' not found in snippet file." << std::endl;
-        return;
-    }
-
-    if (lines.empty()) {
-        std::cerr << "No lines found for template '" << template_name << "'." << std::endl;
-        return;
-    }
-
-    std::fstream target_file_stream(target_file, std::ios::in | std::ios::out);
-    if (!target_file_stream.is_open()) {
-        std::cerr << "Error opening target file: " << target_file << std::endl;
-        return;
-    }
-
-    int current_line = 0;
-
-    while (current_line < line_number && std::getline(target_file_stream, line)) {
-        current_line++;
-        if (current_line == line_number) {
-            for (unsigned int i = 0; i < lines.size(); ++i) {
-                target_file_stream << lines[i] << std::endl;
-            }
-        }
-    }
-
-    if (current_line < line_number) {
-        std::cerr << "Line number " << line_number << " exceeds the number of lines in the target file." << std::endl;
-    }
-    target_file_stream.close();
-    
-    std::cout << "Inserted template '" << template_name << "' into " << target_file << " at line " << line_number << "." << std::endl;
+    // Output a success message
+    std::cout << "Extracted lines from " << source_file
+              << " and saved as template '" << new_template_name
+              << "' in snippet file " << snippet_file << "." << std::endl;
 }

@@ -4,7 +4,15 @@
 #include <vector>
 
 /**
- * Overwrites a specific line in a file with a set of new lines, preserving indentation.
+ * @brief Overwrites a specific line in a target file with a given set of lines.
+ *
+ * Reads the target file into memory, pads it with empty lines if needed, and replaces the line at the
+ * specified position with the given lines. The inserted lines are automatically indented to match the
+ * indentation of the original line being replaced. The modified content is then written back to the file.
+ *
+ * @param target_file The path to the file to modify.
+ * @param lines A vector of strings to insert into the file.
+ * @param line_number The 1-based line number where the insertion should occur.
  */
 
  void file_overwrite(std::string& target_file, std::vector<std::string>& lines, int line_number) {
@@ -69,11 +77,28 @@
     target_output.close();
 }
 
-
 /**
- * Inserts a named snippet from a snippet file into a specific line of a target file.
- * Preserves indentation by detecting the target line's formatting, pads lines if necessary,
- * and replaces the line at the specified location with the snippet content.
+ * @brief Inserts a named code snippet into a target file at a specified line number.
+ *
+ * This function reads a code snippet from the given snippet file using a defined template format,
+ * then inserts the snippet into the target file at the specified line number. If the target file
+ * has fewer lines than the insertion point, it is padded with empty lines. The inserted snippet
+ * is automatically indented to match the target line's existing indentation.
+ *
+ * Snippets in the snippet file must be enclosed between:
+ *   #-- name: <template_name>
+ *   ... (snippet content) ...
+ *   #-- end
+ *
+ * @param snippet_file The file path containing named code snippets.
+ * @param target_file The file path to insert the snippet into.
+ * @param template_name The name of the snippet template to insert.
+ * @param line_number The line number in the target file to insert the snippet (1-based index).
+ *
+ * @note
+ * - If the template is not found or contains no content, the function exits with an error message.
+ * - If the target file doesn't exist or is empty, it will be created or padded accordingly.
+ * - The original line at the insertion point is overwritten by the snippet.
  */
 
 void insert(std::string& snippet_file, std::string& target_file,
@@ -125,9 +150,25 @@ std::string& template_name, int line_number) {
               << target_file << " at line " << line_number << "." << std::endl;
 }
 
+/**
+ * @brief Extracts a range of lines from a source file and saves them as a new named template
+ *        in a snippet file, using a standard format with header and end markers.
+ *
+ * The function checks for errors such as missing files, invalid ranges, or duplicate template names.
+ * It appends the extracted content to the end of the snippet file, formatted with `#-- name:` and `#-- end` markers.
+ *
+ * @param source_file Path to the source file to extract lines from.
+ * @param start_line First line of the range to extract (1-based index).
+ * @param end_line Last line of the range to extract (inclusive).
+ * @param new_template_name Name of the new snippet template.
+ * @param snippet_file Path to the snippet file where the template will be stored.
+ */
+
 void extract(std::string& source_file, int start_line,
 int end_line, std::string& new_template_name, std::string& snippet_file) {
     int line_number = 0;
+
+    // Opening and validating the source file for reading
     std::ifstream source_input(source_file);
     if (!source_input.is_open()) {
         std::cerr << "Error opening source file: " << source_file << std::endl;
@@ -137,6 +178,10 @@ int end_line, std::string& new_template_name, std::string& snippet_file) {
     std::vector<std::string> extracted_lines;
     std::string line;
 
+    // Adding header line
+    extracted_lines.push_back("#-- name: " + new_template_name);
+
+    // Adding lines within the specified range
     while (std::getline(source_input, line)) {
         line_number++;
         if (line_number >= start_line && line_number <= end_line) {
@@ -144,21 +189,50 @@ int end_line, std::string& new_template_name, std::string& snippet_file) {
         }
     }
 
-    if (extracted_lines.empty()) {
+    // Add the end line to the extracted lines
+    extracted_lines.push_back("#-- end");
+
+    // Check if any lines were extracted
+    if (extracted_lines.size() == 2) { // Only the header and end lines
         std::cerr << "No lines extracted from " << source_file
                   << " for the specified range." << std::endl;
         source_input.close();
         return;
     }
 
-    if (extracted_lines.size() != (end_line - start_line + 1)) {
+    // If the number of extracted lines does not match the expected range, report an error
+    if ((int)extracted_lines.size() != (end_line - start_line + 3)) { // +3 for header and end lines
         std::cerr << "Extracted lines do not match the specified range." << std::endl;
         return;
     }
 
     source_input.close();
 
-    // std::ofstream snippet_output(snippet_file, )
+    line_number = 0;
+    std::ifstream snippet_input(snippet_file);
+    if (!snippet_input.is_open()) {
+        std::cerr << "Error opening snippet file: " << snippet_file << std::endl;
+        return;
+    }
+    
+    // Check if the template already exists in the snippet file
+    while (std::getline(snippet_input, line)) {
+        line_number++;
+        if (line == "#-- name: " + new_template_name) {
+            std::cerr << "Template '" << new_template_name << "' already exists in snippet file." << std::endl;
+            snippet_input.close();
+            return;
+        }
+    }
+
+    snippet_input.close();
+
+    file_overwrite(snippet_file, extracted_lines, line_number + 2); // +2 to account for the header and end lines
+
+    // Output a success message
+    std::cout << "Extracted lines from " << source_file
+              << " and saved as template '" << new_template_name
+              << "' in snippet file " << snippet_file << "." << std::endl;
 }
 
 int main(int argc, char* argv[]) {
