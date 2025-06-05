@@ -80,4 +80,4 @@ Rename a template
 
 ## Project Status
 
-⚠️ **Note**: CodeSnip is mostly complete and compiles successfully, with core functionality implemented and working as intended. However, a few minor bugs and edge cases remain and are currently being debugged. Further polish and improvements are ongoing.
+⚠️ **Note**: CodeSnip is almost complete and compiles successfully, with most of the core functionality implemented and working as intended. However, a few bugs and edge cases remain and are currently being debugged. Further polish and improvements are ongoing.
