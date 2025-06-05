@@ -1,6 +1,6 @@
-# codesnip
+# CodeSnip - CLI Snippet Manager
 
-`codesnip` is a minimalist command-line tool for managing and reusing code snippets and templates. Snippets are stored in plain-text files, each containing multiple templates, and can be inserted or extracted from your source code files with simple commands.
+`CodeSnip` is a minimalist command-line tool for managing and reusing code snippets and templates. Snippets are stored in plain-text files, each containing multiple templates, and can be inserted or extracted from your source code files with simple commands.
 
 ---
 
