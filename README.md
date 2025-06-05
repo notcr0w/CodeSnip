@@ -4,17 +4,16 @@
 
 ---
 
-## 📦 Features
+## Features
 
 - Store multiple named templates in a single snippet file
 - Insert templates into any file at a specific line
 - Extract lines from your code and save them as new templates
 - List, show, delete, and rename templates
-- A terminal and a text editor is all thats required.
 
 ---
 
-## 📝 Snippet File Format
+## Snippet File Format
 
 Each snippet is enclosed between `#-- name: <template_name>` and `#-- end`. Multiple snippets can be stored in a single `.txt` file.
 
