@@ -1,0 +1,71 @@
+#-- name: include
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#-- end
+
+#-- name: insert
+void insert(std::string &snippet_file, std::string& target_file,
+std::string &template_name, int line_number) {
+    std::ifstream snippet_input(snippet_file);
+    if (!snippet_input.is_open()) {
+        std::cerr << "Error opening snippet file: " << snippet_file << std::endl;
+        return;
+    }
+
+    std::vector<std::string> lines;
+    std::string line;
+    bool found = false;
+
+    while (std::getline(snippet_input, line)) {
+        if (line == "#-- name: " + template_name) {
+            found = true;
+            continue;
+        }
+
+        if (found) {
+            if (line == "#-- end") {
+                break;
+            }
+            lines.push_back(line);
+        }
+    }
+
+    snippet_input.close();
+
+    if (!found) {
+        std::cerr << "Template '" << template_name << "' not found in snippet file." << std::endl;
+        return;
+    }
+
+    if (lines.empty()) {
+        std::cerr << "No lines found for template '" << template_name << "'." << std::endl;
+        return;
+    }
+
+    std::fstream target_file_stream(target_file, std::ios::in | std::ios::out);
+    if (!target_file_stream.is_open()) {
+        std::cerr << "Error opening target file: " << target_file << std::endl;
+        return;
+    }
+
+    int current_line = 0;
+
+    while (current_line < line_number && std::getline(target_file_stream, line)) {
+        current_line++;
+        if (current_line == line_number) {
+            for (unsigned int i = 0; i < lines.size(); ++i) {
+                target_file_stream << lines[i] << std::endl;
+            }
+        }
+    }
+
+    if (current_line < line_number) {
+        std::cerr << "Line number " << line_number << " exceeds the number of lines in the target file." << std::endl;
+    }
+    target_file_stream.close();
+    
+    std::cout << "Inserted template '" << template_name << "' into " << target_file << " at line " << line_number << "." << std::endl;
+}
+#-- end
