@@ -235,6 +235,31 @@ int end_line, std::string& new_template_name, std::string& snippet_file) {
               << "' in snippet file " << snippet_file << "." << std::endl;
 }
 
+void list_templates(std::string& snippet_file) {
+    std::ifstream snippet_input(snippet_file);
+    if (!snippet_input.is_open()) {
+        std::cerr << "Error opening snippet file: " << snippet_file << std::endl;
+        return;
+    }
+
+    std::string line;
+    bool found = false;
+
+    // Read the snippet file and print all template names
+    while (std::getline(snippet_input, line)) {
+        if (line.find("#-- name: ") == 0) {
+            found = true;
+            std::cout << line.substr(10) << std::endl; // Print the template name
+        }
+    }
+
+    if (!found) {
+        std::cout << "No templates found in " << snippet_file << "." << std::endl;
+    }
+
+    snippet_input.close();
+}
+
 int main(int argc, char* argv[]) {
     if (argc == 1) {
         return 1;
@@ -284,6 +309,16 @@ int main(int argc, char* argv[]) {
         std::string snippet_file = argv[6];
 
         extract(source_file, start_line, end_line, new_template_name, snippet_file);
+    }
+
+    else if (command == "list") {
+        if (argc < 3) {
+            std::cerr << "Usage: " << argv[0] << " list <snippet_file>" << std::endl;
+            return 1;
+        }
+
+        std::string snippet_file = argv[2];
+        list_templates(snippet_file);
     }
     
     else {
