@@ -3,8 +3,14 @@
 #include <string>
 #include <vector>
 
+/**
+ * Inserts a named snippet from a snippet file into a specific line of a target file.
+ * Preserves indentation by detecting the target line's formatting, pads lines if necessary,
+ * and replaces the line at the specified location with the snippet content.
+ */
 void insert(std::string& snippet_file, std::string& target_file,
 std::string& template_name, int line_number) {
+    // Open the snippet file for reading
     std::ifstream snippet_input(snippet_file);
     if (!snippet_input.is_open()) {
         std::cerr << "Error opening snippet file: " << snippet_file << std::endl;
@@ -15,6 +21,7 @@ std::string& template_name, int line_number) {
     std::string line;
     bool found = false;
 
+    // Search for the template by name and extract its lines
     while (std::getline(snippet_input, line)) {
         if (line == "#-- name: " + template_name) {
             found = true;
@@ -31,6 +38,7 @@ std::string& template_name, int line_number) {
 
     snippet_input.close();
 
+    // If the template wasn't found or was empty, exit
     if (!found) {
         std::cerr << "Template '" << template_name << "' not found in snippet file." << std::endl;
         return;
@@ -41,6 +49,7 @@ std::string& template_name, int line_number) {
         return;
     }
 
+    // Read the target file line-by-line into a vector
     std::ifstream target_input(target_file);
     std::vector<std::string> target_lines;
 
@@ -51,10 +60,12 @@ std::string& template_name, int line_number) {
         target_input.close();
     }
 
+    // Pad the target file with empty lines if it's too short
     while ((int)target_lines.size() < line_number) {
         target_lines.push_back("");
     }
 
+    // Detect indentation of the target line to preserve formatting
     std::string indent = "";
     if (!target_lines[line_number - 1].empty()) {
         std::string& target_line = target_lines[line_number - 1];
@@ -67,15 +78,18 @@ std::string& template_name, int line_number) {
         }
     }
 
+    // Prepend indentation to each line of the snippet
     for (int i = 0; i < (int)snippet_lines.size(); ++i) {
         snippet_lines[i] = indent + snippet_lines[i];
     }
 
+    // Overwrite the original line and insert the snippet in its place
     target_lines.erase(target_lines.begin() + (line_number - 1));
     for (int i = 0; i < (int)snippet_lines.size(); ++i) {
         target_lines.insert(target_lines.begin() + (line_number - 1 + i), snippet_lines[i]);
     }
 
+    // Write the modified content back to the target file
     std::ofstream target_output(target_file);
     if (!target_output.is_open()) {
         std::cerr << "Error writing to target file: " << target_file << std::endl;
