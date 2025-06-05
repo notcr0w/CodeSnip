@@ -274,6 +274,52 @@ int end_line, std::string& new_template_name, std::string& snippet_file) {
     snippet_input.close();
 }
 
+/**
+ * @brief Displays the contents of a specific template from a snippet file.
+ *
+ * Searches for the specified template name in the snippet file and prints its
+ * entire content, including the `#-- name:` header and all lines up to (but not including)
+ * the `#-- end` marker. If the template does not exist, an error message is shown.
+ *
+ * @param template_name The name of the template to display.
+ * @param snippet_file Path to the snippet file containing the templates.
+ */
+
+void show(std::string& template_name, std::string& snippet_file) {
+    // Open the snippet file for reading
+    std::ifstream snippet_input(snippet_file);
+    if (!snippet_input.is_open()) {
+        std::cerr << "Error opening snippet file: " << snippet_file << std::endl;
+        return;
+    }
+
+    std::string line;
+    bool found = false;
+
+    // Search for the template by name and print its lines
+    while (std::getline(snippet_input, line)) {
+        if (line == "#-- name: " + template_name) {
+            found = true;
+            std::cout << line << std::endl; // Print the header line
+            continue;
+        }
+
+        if (found) {
+            if (line == "#-- end") {
+                break; // Stop reading when we reach the end marker
+            }
+            std::cout << line << std::endl; // Print the content of the template
+        }
+    }
+
+    snippet_input.close();
+
+    // If the template wasn't found, print an error message
+    if (!found) {
+        std::cerr << "Template '" << template_name << "' not found in snippet file." << std::endl;
+    }
+}
+
 int main(int argc, char* argv[]) {
     if (argc == 1) {
         return 1;
@@ -333,6 +379,17 @@ int main(int argc, char* argv[]) {
 
         std::string snippet_file = argv[2];
         list_templates(snippet_file);
+    }
+
+    else if (command == "show") {
+        if (argc < 4) {
+            std::cerr << "Usage: " << argv[0] << " show <template_name> <snippet_file>" << std::endl;
+            return 1;
+        }
+
+        std::string template_name = argv[2];
+        std::string snippet_file = argv[3];
+        show(template_name, snippet_file);
     }
     
     else {
