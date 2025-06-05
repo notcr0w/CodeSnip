@@ -320,6 +320,106 @@ void show(std::string& template_name, std::string& snippet_file) {
     }
 }
 
+/**
+ * @brief Deletes a specified template from a snippet file.
+ *
+ * Scans the snippet file for a template with the given name and removes its entire content,
+ * including the `#-- name:` header and `#-- end` marker. All other lines are preserved.
+ * If the template is not found, an error message is displayed. The file is then overwritten
+ * with the remaining content.
+ *
+ * @param template_name The name of the template to delete.
+ * @param snippet_file Path to the snippet file to update.
+ */
+
+void delete_template(std::string& template_name, std::string& snippet_file) {
+    // Open the snippet file for reading
+    std::ifstream snippet_input(snippet_file);
+    if (!snippet_input.is_open()) {
+        std::cerr << "Error opening snippet file: " << snippet_file << std::endl;
+        return;
+    }
+
+    std::vector<std::string> lines;
+    std::string line;
+    bool found = false;
+
+    // Read the file line by line
+    while (std::getline(snippet_input, line)) {
+        if (line == "#-- name: " + template_name) {
+            found = true; // Template found, skip it
+            while (std::getline(snippet_input, line) && line != "#-- end") {
+                // Skip lines until we reach the end marker
+            }
+            continue; // Skip the end marker as well
+        }
+        lines.push_back(line); // Keep other lines
+    }
+
+    snippet_input.close();
+
+    // If the template was not found, print an error message
+    if (!found) {
+        std::cerr << "Template '" << template_name << "' not found in snippet file." << std::endl;
+        return;
+    }
+
+    file_overwrite(snippet_file, lines, 1); // Overwrite the snippet file with the remaining lines
+    
+    // Output a success message
+    std::cout << "Deleted template '" << template_name << "' from " << snippet_file << "." << std::endl;
+}
+
+/**
+ * @brief Renames a template within a snippet file.
+ *
+ * Searches for a template with the specified old name in the snippet file and replaces
+ * its `#-- name:` header with a new name. The rest of the template's content remains unchanged.
+ * If the original template name is not found, an error message is displayed. The file is then
+ * overwritten with the updated lines.
+ *
+ * @param old_template_name The current name of the template to rename.
+ * @param new_template_name The new name to assign to the template.
+ * @param snippet_file Path to the snippet file containing the template.
+ */
+
+void rename(std::string& old_template_name, std::string& new_template_name, std::string& snippet_file) {
+    // Open the snippet file for reading
+    std::ifstream snippet_input(snippet_file);
+    if (!snippet_input.is_open()) {
+        std::cerr << "Error opening snippet file: " << snippet_file << std::endl;
+        return;
+    }
+
+    std::vector<std::string> lines;
+    std::string line;
+    bool found = false;
+
+    // Read the file line by line
+    while (std::getline(snippet_input, line)) {
+        if (line == "#-- name: " + old_template_name) {
+            found = true; // Template found, rename it
+            lines.push_back("#-- name: " + new_template_name);
+            continue; // Skip the old name line
+        }
+        lines.push_back(line); // Keep other lines
+    }
+
+    snippet_input.close();
+
+    // If the template was not found, print an error message
+    if (!found) {
+        std::cerr << "Template '" << old_template_name << "' not found in snippet file." << std::endl;
+        return;
+    }
+
+    file_overwrite(snippet_file, lines, 1); // Overwrite the snippet file with the modified lines
+    
+    // Output a success message
+    std::cout << "Renamed template '" << old_template_name << "' to '" << new_template_name 
+              << "' in " << snippet_file << "." << std::endl;
+}
+
 int main(int argc, char* argv[]) {
     if (argc == 1) {
         return 1;
@@ -390,6 +490,29 @@ int main(int argc, char* argv[]) {
         std::string template_name = argv[2];
         std::string snippet_file = argv[3];
         show(template_name, snippet_file);
+    }
+
+    else if (command == "delete") {
+        if (argc < 4) {
+            std::cerr << "Usage: " << argv[0] << " delete <template_name> <snippet_file>" << std::endl;
+            return 1;
+        }
+
+        std::string template_name = argv[2];
+        std::string snippet_file = argv[3];
+        delete_template(template_name, snippet_file);
+    }
+
+    else if (command == "rename") {
+        if (argc < 5) {
+            std::cerr << "Usage: " << argv[0] << " rename <old_template_name> <new_template_name> <snippet_file>" << std::endl;
+            return 1;
+        }
+
+        std::string old_template_name = argv[2];
+        std::string new_template_name = argv[3];
+        std::string snippet_file = argv[4];
+        rename(old_template_name, new_template_name, snippet_file);
     }
     
     else {
