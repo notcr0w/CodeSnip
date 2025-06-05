@@ -10,7 +10,7 @@
 - Insert templates into any file at a specific line
 - Extract lines from your code and save them as new templates
 - List, show, delete, and rename templates
-- No databases, no dependencies — just your terminal and your text editor
+- A terminal and a text editor is all thats required.
 
 ---
 
