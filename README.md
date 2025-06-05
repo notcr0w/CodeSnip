@@ -76,3 +76,8 @@ Rename a template
 ./codesnip.exe insert <template_name> <target_file> <line_number> <snippet_file> --dry-run
 ```
 
+---
+
+## Project Status
+
+⚠️ **Note**: CodeSnip is mostly complete and compiles successfully, with core functionality implemented and working as intended. However, a few minor bugs and edge cases remain and are currently being debugged. Further polish and improvements are ongoing.
