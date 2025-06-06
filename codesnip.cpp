@@ -15,7 +15,8 @@
  * @param line_number The 1-based line number where the insertion should occur.
  */
 
- void file_overwrite(std::string& target_file, std::vector<std::string>& lines, int line_number) {
+void file_overwrite(std::string& target_file, std::vector<std::string>& lines, int line_number, 
+bool is_delete_or_rename = false) {
     // Open the target file for reading
     std::ifstream target_input(target_file);
     std::vector<std::string> target_lines;
@@ -27,39 +28,45 @@
         return;
     }
 
-    // Read each line from the target file into a vector
-    while (std::getline(target_input, line)) {
-        target_lines.push_back(line);
-    }
-    target_input.close();
+    if (!is_delete_or_rename) {
+        // Read each line from the target file into a vector
+        while (std::getline(target_input, line)) {
+            target_lines.push_back(line);
+        }
+        target_input.close();
 
-    // If the file is shorter than the desired line number, pad it with empty lines
-    while ((int)target_lines.size() < line_number) {
-        target_lines.push_back("");
-    }
+        // If the file is shorter than the desired line number, pad it with empty lines
+        while ((int)target_lines.size() < line_number) {
+            target_lines.push_back("");
+        }
 
-    // Determine the indentation of the line to be overwritten
-    std::string indent = "";
-    if (!target_lines[line_number - 1].empty()) {
-        std::string& target_line = target_lines[line_number - 1];
-        for (int i = 0; i < (int)target_line.size(); ++i) {
-            if (target_line[i] == ' ' || target_line[i] == '\t') {
-                indent += target_line[i];
-            } else {
-                break;
+        // Determine the indentation of the line to be overwritten
+        std::string indent = "";
+        if (!target_lines[line_number - 1].empty()) {
+            std::string& target_line = target_lines[line_number - 1];
+            for (int i = 0; i < (int)target_line.size(); ++i) {
+                if (target_line[i] == ' ' || target_line[i] == '\t') {
+                    indent += target_line[i];
+                } else {
+                    break;
+                }
             }
+        }
+
+        // Apply the same indentation to all new lines to maintain visual consistency
+        for (int i = 0; i < (int)lines.size(); ++i) {
+            lines[i] = indent + lines[i];
+        }
+
+        // Remove the original line and insert the new lines in its place
+        target_lines.erase(target_lines.begin() + (line_number - 1));
+        for (int i = 0; i < (int)lines.size(); ++i) {
+            target_lines.insert(target_lines.begin() + (line_number - 1 + i), lines[i]);
         }
     }
 
-    // Apply the same indentation to all new lines to maintain visual consistency
-    for (int i = 0; i < (int)lines.size(); ++i) {
-        lines[i] = indent + lines[i];
-    }
-
-    // Remove the original line and insert the new lines in its place
-    target_lines.erase(target_lines.begin() + (line_number - 1));
-    for (int i = 0; i < (int)lines.size(); ++i) {
-        target_lines.insert(target_lines.begin() + (line_number - 1 + i), lines[i]);
+    else {
+        target_lines = lines;
     }
 
     // Open the target file again, this time for writing the updated content
@@ -227,7 +234,11 @@ int end_line, std::string& new_template_name, std::string& snippet_file) {
 
     snippet_input.close();
 
-    file_overwrite(snippet_file, extracted_lines, line_number + 2); // +2 to account for the header and end lines
+    // Write the extracted lines to the snippet file, starting at the end of the file
+    // +1 to account for first line being the header
+    // +2 to account for the header and end lines
+    file_overwrite(snippet_file, extracted_lines, 
+    (line_number == 0) ? line_number + 1 : line_number + 2);
 
     // Output a success message
     std::cout << "Extracted lines from " << source_file
@@ -364,7 +375,7 @@ void delete_template(std::string& template_name, std::string& snippet_file) {
         return;
     }
 
-    file_overwrite(snippet_file, lines, 1); // Overwrite the snippet file with the remaining lines
+    file_overwrite(snippet_file, lines, 1, true); // Overwrite the snippet file with the remaining lines
     
     // Output a success message
     std::cout << "Deleted template '" << template_name << "' from " << snippet_file << "." << std::endl;
@@ -413,7 +424,7 @@ void rename(std::string& old_template_name, std::string& new_template_name, std:
         return;
     }
 
-    file_overwrite(snippet_file, lines, 1); // Overwrite the snippet file with the modified lines
+    file_overwrite(snippet_file, lines, 1, true); // Overwrite the snippet file with the modified lines
     
     // Output a success message
     std::cout << "Renamed template '" << old_template_name << "' to '" << new_template_name 
