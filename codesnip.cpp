@@ -13,6 +13,9 @@
  * @param target_file The path to the file to modify.
  * @param lines A vector of strings to insert into the file.
  * @param line_number The 1-based line number where the insertion should occur.
+ * @param is_delete_or_rename If true, the function will overwrite the entire file with the provided lines,
+ *                            effectively deleting the original content. If false, it will insert the lines
+ *                            at the specified line number, preserving the rest of the file's content.
  */
 
 void file_overwrite(std::string& target_file, std::vector<std::string>& lines, int line_number, 
