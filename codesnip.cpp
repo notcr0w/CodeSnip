@@ -434,6 +434,88 @@ void rename(std::string& old_template_name, std::string& new_template_name, std:
               << "' in " << snippet_file << "." << std::endl;
 }
 
+// Displays a help menu with an overview of commands and detailed usage info including parameter descriptions.
+void show_help() {
+    // Print all available commands
+    std::cout << "Available commands:\n";
+    std::cout << "  insert    - Insert a snippet into a file\n";
+    std::cout << "  extract   - Extract code from a file and save as a snippet\n";
+    std::cout << "  list      - List all templates in a snippet file\n";
+    std::cout << "  show      - Show the contents of a template\n";
+    std::cout << "  delete    - Delete a template by name\n";
+    std::cout << "  rename    - Rename a template\n";
+    std::cout << "  help      - Show this help message\n";
+
+    std::string cmd;
+
+    // Loop to allow users to explore multiple commands
+    while (true) {
+        std::cout << "\nEnter a command for more info (or 'exit' to quit): ";
+        std::cin >> cmd;
+
+        if (cmd == "insert") {
+            std::cout << "\nUsage:\n"
+                      << "  ./codesnip.exe insert <template_name> <target_file> <line_number> <snippet_file> [--dry-run]\n"
+                      << "Description:\n"
+                      << "  Inserts the specified snippet template into the target file at the given line.\n"
+                      << "Parameters:\n"
+                      << "  <template_name>   - Name of the snippet template to insert\n"
+                      << "  <target_file>     - File where the snippet will be inserted\n"
+                      << "  <line_number>     - Line number in the target file where the snippet should be inserted\n"
+                      << "  <snippet_file>    - File containing all the saved snippets\n";
+        } else if (cmd == "extract") {
+            std::cout << "\nUsage:\n"
+                      << "  ./codesnip.exe extract <source_file> <start_line> <end_line> <new_template_name> <snippet_file>\n"
+                      << "Description:\n"
+                      << "  Extracts a block of code from the source file and saves it as a named template.\n"
+                      << "Parameters:\n"
+                      << "  <source_file>         - File to extract code from\n"
+                      << "  <start_line>          - Starting line number of the code block\n"
+                      << "  <end_line>            - Ending line number of the code block\n"
+                      << "  <new_template_name>   - Name to assign to the new snippet\n"
+                      << "  <snippet_file>        - File to save the new snippet into\n";
+        } else if (cmd == "list") {
+            std::cout << "\nUsage:\n"
+                      << "  ./codesnip.exe list <snippet_file>\n"
+                      << "Description:\n"
+                      << "  Lists all stored template names in the given snippet file.\n"
+                      << "Parameters:\n"
+                      << "  <snippet_file>  - File containing all the stored snippets\n";
+        } else if (cmd == "show") {
+            std::cout << "\nUsage:\n"
+                      << "  ./codesnip.exe show <template_name> <snippet_file>\n"
+                      << "Description:\n"
+                      << "  Displays the contents of the specified snippet template.\n"
+                      << "Parameters:\n"
+                      << "  <template_name>  - Name of the snippet to display\n"
+                      << "  <snippet_file>   - File containing the snippet\n";
+        } else if (cmd == "delete") {
+            std::cout << "\nUsage:\n"
+                      << "  ./codesnip.exe delete <template_name> <snippet_file>\n"
+                      << "Description:\n"
+                      << "  Deletes the specified snippet template from the file.\n"
+                      << "Parameters:\n"
+                      << "  <template_name>  - Name of the snippet to delete\n"
+                      << "  <snippet_file>   - File containing the snippet\n";
+        } else if (cmd == "rename") {
+            std::cout << "\nUsage:\n"
+                      << "  ./codesnip.exe rename <old_name> <new_name> <snippet_file>\n"
+                      << "Description:\n"
+                      << "  Renames a snippet template in the snippet file.\n"
+                      << "Parameters:\n"
+                      << "  <old_name>       - Current name of the snippet\n"
+                      << "  <new_name>       - New name to assign to the snippet\n"
+                      << "  <snippet_file>   - File containing the snippet\n";
+        } else if (cmd == "help") {
+            std::cout << "You're already in help mode.\n";
+        } else if (cmd == "exit") {
+            break;
+        } else {
+            std::cout << "Unknown command: " << cmd << "\n";
+        }
+    }
+}
+
 int main(int argc, char* argv[]) {
     // Check if at least one argument (the command) is provided
     if (argc == 1) {
@@ -537,6 +619,11 @@ int main(int argc, char* argv[]) {
         std::string new_template_name = argv[3];
         std::string snippet_file = argv[4];
         rename(old_template_name, new_template_name, snippet_file);
+    }
+
+    // Handle 'help' command
+    else if (command == "help") {
+        show_help();
     }
 
     // Unknown command handler
