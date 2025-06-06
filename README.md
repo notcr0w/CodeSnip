@@ -10,7 +10,7 @@
 - Insert templates into any file at a specific line
 - Extract lines from your code and save them as new templates
 - List, show, delete, and rename templates
-
+- Built-in interactive help command that explains each available command and its parameters
 ---
 
 ## Snippet File Format
@@ -71,4 +71,7 @@ Rename a template
 ./codesnip.exe rename <old_name> <new_name> <snippet_file>
 ```
 
----
+Display usage information and command-specific details
+```
+./codesnip.exe help
+```
