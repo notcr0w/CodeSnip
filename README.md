@@ -81,4 +81,4 @@ Display usage information and command-specific details
 ---
 
 ## Contact
-If you encounter any bugs, edge cases, or have suggestions for improvements, feel free to reach me out at huysteve26@outlook.com.
+If you encounter any bugs, edge cases, have suggestions for improvements, or questions, feel free to reach me out at huysteve26@outlook.com.
