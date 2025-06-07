@@ -2,6 +2,8 @@
 
 `CodeSnip` is a minimalist command-line tool for managing and reusing code snippets and templates. Snippets are stored in plain-text files, each containing multiple templates, and can be inserted or extracted from your source code files with simple commands.
 
+I noticed that I often reuse boilerplate or code blocks across projects and assignments, and wanted a simple, convenient tool to manage and inject these snippets directly into my code while working. So I created CodeSnip to help streamline my development process. I hope others find it useful in their own workflows as well.
+
 ---
 
 ## Features
